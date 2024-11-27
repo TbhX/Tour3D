@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { Building2 } from 'lucide-react';
 import { useStore } from '../store';
 import { useSpring, animated } from '@react-spring/web';
@@ -7,6 +7,7 @@ import { FloorIndicator } from './FloorIndicator';
 export function Navigation() {
   const { currentFloor, targetFloor, setTargetFloor, isTransitioning } = useStore();
   const elevatorRef = useRef<HTMLDivElement>(null);
+  const [scrollPosition, setScrollPosition] = useState(0);
 
   // Fonction pour changer d'étage
   const handleFloorChange = useCallback(
@@ -47,15 +48,12 @@ export function Navigation() {
     }
   };
 
-  // Gestion des clics sur le track (piste de l'ascenseur)
-  const handleTrackClick = (e: React.MouseEvent) => {
-    if (!isTransitioning) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const y = e.clientY - rect.top;
-      const percentage = 1 - y / rect.height;
-      const floor = Math.round(percentage * 100);
-      handleFloorChange(Math.max(1, Math.min(100, floor))); // Contrainte de l'étage entre 1 et 100
-    }
+  // Fonction pour gérer le défilement
+  const handleScroll = (e: React.UIEvent) => {
+    const scrollY = e.currentTarget.scrollTop;
+    const newFloor = Math.round(((100 - scrollY) / e.currentTarget.scrollHeight) * 100);
+    handleFloorChange(Math.max(1, Math.min(100, newFloor)));
+    setScrollPosition(scrollY);
   };
 
   return (
@@ -88,7 +86,15 @@ export function Navigation() {
                 ref={elevatorRef}
                 className="absolute w-full cursor-pointer"
                 style={{ height: '100%' }}
-                onClick={handleTrackClick}
+                onClick={(e) => {
+                  if (!isTransitioning) {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const y = e.clientY - rect.top;
+                    const percentage = 1 - y / rect.height;
+                    const floor = Math.round(percentage * 100);
+                    handleFloorChange(Math.max(1, Math.min(100, floor))); // Contrainte de l'étage entre 1 et 100
+                  }
+                }}
               >
                 {/* Indicateur d'ascenseur animé */}
                 <animated.div
@@ -114,6 +120,14 @@ export function Navigation() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Zone avec la possibilité de défiler pour changer d'étage */}
+      <div
+        className="overflow-y-scroll h-screen w-screen absolute top-0 left-0 z-0"
+        onScroll={handleScroll}
+      >
+        {/* Cette zone est utilisée pour le défilement et l'interaction avec la scrollbar */}
       </div>
     </>
   );
