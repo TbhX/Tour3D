@@ -21,7 +21,7 @@ export function Navigation() {
   // Animation de l'ascenseur avec react-spring
   const [styles, api] = useSpring(() => ({
     top: `${((100 - currentFloor) / 100) * 100}%`,
-    config: { tension: 120, friction: 14 },
+    config: { tension: 180, friction: 20 },
   }));
 
   // Mise à jour de l'animation à chaque changement d'étage
@@ -46,7 +46,7 @@ export function Navigation() {
         <div
           className="absolute inset-0 transition-all duration-500"
           style={{
-            transform: `perspective(1000px) rotateX(${(targetFloor - 1) * 3}deg) translateY(-${(targetFloor - 1) * 100}vh)`,
+            transform: `perspective(1000px) rotateX(${(targetFloor - 1) * 2}deg) translateY(-${(targetFloor - 1) * 100}vh)`,
             transitionProperty: "transform",
           }}
         >
