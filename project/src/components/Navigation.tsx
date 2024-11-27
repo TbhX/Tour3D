@@ -1,105 +1,78 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { Building2 } from 'lucide-react';
 import { useStore } from '../store';
 import { useSpring, animated } from '@react-spring/web';
 import { FloorIndicator } from './FloorIndicator';
-import { useThree } from '@react-three/fiber';
-import { gsap } from 'gsap';
 
 export function Navigation() {
-  const { 
-    currentFloor, 
-    targetFloor, 
-    setTargetFloor, 
-    isTransitioning,
-    setDirection 
-  } = useStore();
-
+  const { currentFloor, targetFloor, setTargetFloor, isTransitioning } = useStore();
   const elevatorRef = useRef<HTMLDivElement>(null);
-  const { camera } = useThree();
 
-  // Debugging: Logging currentFloor, targetFloor, and isTransitioning
-  console.log('currentFloor:', currentFloor, 'targetFloor:', targetFloor, 'isTransitioning:', isTransitioning);
+  // Fonction pour changer d'étage
+  const handleFloorChange = useCallback(
+    (floor: number) => {
+      if (floor >= 1 && floor <= 100 && !isTransitioning) {
+        setTargetFloor(floor);
+      }
+    },
+    [isTransitioning, setTargetFloor]
+  );
 
-  const handleFloorChange = (floor: number) => {
-    console.log("Attempting to change to floor:", floor);  // Debugging floor change
-    if (floor >= 1 && floor <= 100 && !isTransitioning) {
-      console.log("Changing floor direction:", floor > targetFloor ? 'up' : 'down');  // Debugging direction
-      setDirection(floor > targetFloor ? 'up' : 'down');
-      setTargetFloor(floor);
-
-      // Logique de zoom caméra
-      const yOffset = (floor - 50) * 4;
-      console.log("Camera Y offset:", yOffset);  // Debugging yOffset
-
-      // Animation de la caméra avec GSAP
-      gsap.to(camera.position, {
-        y: 20 + yOffset,
-        z: 20,
-        x: 20,
-        duration: 1.5,
-        ease: "power2.inOut",
-        onStart: () => console.log('Animation started'),  // GSAP onStart
-        onComplete: () => console.log('Animation completed'),  // GSAP onComplete
-      });
-    }
-  };
-
+  // Animation de l'ascenseur avec react-spring
   const [styles, api] = useSpring(() => ({
     top: `${((100 - currentFloor) / 100) * 100}%`,
     config: { tension: 120, friction: 14 },
   }));
 
+  // Mise à jour de l'animation à chaque changement d'étage
   useEffect(() => {
-    console.log("targetFloor has changed to:", targetFloor);  // Debugging targetFloor change
     api.start({
       top: `${((100 - targetFloor) / 100) * 100}%`,
     });
-  }, [targetFloor]);
+  }, [targetFloor, api]);
 
+  // Gestion des clics sur l'écran
   const handleScreenClick = (e: React.MouseEvent) => {
     if (!isTransitioning) {
       const rect = e.currentTarget.getBoundingClientRect();
       const clickY = e.clientY - rect.top;
       const halfHeight = rect.height / 2;
 
-      console.log("Screen clicked. Y position:", clickY, "Half height:", halfHeight);  // Debugging click position
-
+      // Cliquez sur la moitié supérieure ou inférieure de l'écran pour changer d'étage
       if (clickY < halfHeight) {
-        // Monter d'un étage
-        handleFloorChange(targetFloor + 1);
+        handleFloorChange(targetFloor + 1); // Aller à l'étage supérieur
       } else {
-        // Descendre d'un étage
-        handleFloorChange(targetFloor - 1);
+        handleFloorChange(targetFloor - 1); // Aller à l'étage inférieur
       }
     }
   };
 
+  // Gestion des clics sur le track (piste de l'ascenseur)
   const handleTrackClick = (e: React.MouseEvent) => {
     if (!isTransitioning) {
       const rect = e.currentTarget.getBoundingClientRect();
       const y = e.clientY - rect.top;
       const percentage = 1 - y / rect.height;
       const floor = Math.round(percentage * 100);
-
-      console.log("Track clicked. Calculated floor:", floor);  // Debugging floor calculation
-      handleFloorChange(Math.max(1, Math.min(100, floor)));
+      handleFloorChange(Math.max(1, Math.min(100, floor))); // Contrainte de l'étage entre 1 et 100
     }
   };
 
   return (
     <>
-      {/* Zones cliquables à l'écran */}
+      {/* Zone cliquable de l'écran */}
       <div 
         className="fixed inset-0 z-0"
         onClick={handleScreenClick}
       />
-
+      
+      {/* Panneau d'ascenseur à droite de l'écran */}
       <div className="fixed right-8 top-1/2 -translate-y-1/2 z-10">
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6">
           <div className="flex flex-col items-center">
+            {/* Piste de l'ascenseur */}
             <div className="relative w-10 h-80 bg-gray-200 rounded-full overflow-hidden">
-              {/* Marqueurs d'étage */}
+              {/* Marqueurs d'étages */}
               <div className="absolute inset-0 flex flex-col justify-between py-2">
                 {[100, 75, 50, 25, 1].map((floor) => (
                   <div
@@ -110,14 +83,14 @@ export function Navigation() {
                 ))}
               </div>
 
-              {/* Piste de l'ascenseur */}
+              {/* Track de l'ascenseur */}
               <div
                 ref={elevatorRef}
                 className="absolute w-full cursor-pointer"
                 style={{ height: '100%' }}
                 onClick={handleTrackClick}
               >
-                {/* Indicateur de l'ascenseur */}
+                {/* Indicateur d'ascenseur animé */}
                 <animated.div
                   style={styles}
                   className="absolute w-10 h-10 -ml-2 -mt-5 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full shadow-lg flex items-center justify-center transform transition-all duration-300 cursor-grab hover:scale-110"
@@ -128,6 +101,7 @@ export function Navigation() {
               </div>
             </div>
 
+            {/* Affichage de l'étage actuel */}
             <div className="mt-4 text-center">
               <div className="font-medium text-lg">
                 Étage {targetFloor}
