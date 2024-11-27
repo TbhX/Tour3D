@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback, useState } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { Building2 } from 'lucide-react';
 import { useStore } from '../store';
 import { useSpring, animated } from '@react-spring/web';
@@ -41,6 +41,26 @@ export function Navigation() {
 
   return (
     <>
+      {/* Affichage de l'étage principal */}
+      <div className="relative w-full h-screen bg-gray-200">
+        {/* Vue principale qui change en fonction de l'étage choisi */}
+        <div
+          className="absolute inset-0 transition-all duration-300"
+          style={{
+            transform: `translateY(-${(targetFloor - 1) * 100}vh)`,
+          }}
+        >
+          {/* Afficher ici le contenu spécifique à chaque étage */}
+          <div
+            className={`${
+              targetFloor === 1 ? 'bg-green-300' : 'bg-blue-300'
+            } h-full flex items-center justify-center`}
+          >
+            <h1 className="text-white text-4xl">Étage {targetFloor}</h1>
+          </div>
+        </div>
+      </div>
+
       {/* Panneau d'ascenseur à droite de l'écran */}
       <div className="fixed right-8 top-1/2 -translate-y-1/2 z-10">
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6">
@@ -88,7 +108,7 @@ export function Navigation() {
             </div>
             
             {/* Flèches de navigation */}
-            <div className="flex space-x-2 mt-4">
+            <div className="flex flex-col space-y-2 mt-4">
               <button
                 onClick={() => handleArrowClick('up')}
                 disabled={isTransitioning || targetFloor >= 100}
