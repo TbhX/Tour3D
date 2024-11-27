@@ -69,7 +69,7 @@ export function Navigation() {
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6">
           <div className="flex flex-col items-center">
             {/* Piste de l'ascenseur */}
-            <div className="relative w-10 h-80 bg-gray-200 rounded-full overflow-hidden">
+            <div className="relative w-10 h-80 sm:h-[calc(100vh-4rem)] md:h-[calc(100vh-8rem)] bg-gray-200 rounded-full overflow-hidden">
               {/* Marqueurs d'étages */}
               <div className="absolute inset-0 flex flex-col justify-between py-2">
                 {[100, 75, 50, 25, 1].map((floor) => (
@@ -124,7 +124,7 @@ export function Navigation() {
 
       {/* Zone avec la possibilité de défiler pour changer d'étage */}
       <div
-        className="overflow-y-scroll h-screen w-screen absolute top-0 left-0 z-0"
+        className="overflow-y-scroll h-[90vh] sm:h-[80vh] md:h-[70vh] w-full absolute top-0 left-0 z-0"
         onScroll={handleScroll}
       >
         {/* Cette zone est utilisée pour le défilement et l'interaction avec la scrollbar */}
