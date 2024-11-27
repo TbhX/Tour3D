@@ -41,23 +41,31 @@ export function Navigation() {
 
   return (
     <>
-      {/* Affichage de l'étage principal */}
-      <div className="relative w-full h-screen bg-gray-200">
+      {/* Vue principale avec les étages */}
+      <div className="relative w-full h-screen overflow-hidden bg-gray-200">
         {/* Vue principale qui change en fonction de l'étage choisi */}
         <div
-          className="absolute inset-0 transition-all duration-300"
+          className="absolute inset-0 transition-all duration-500"
           style={{
             transform: `translateY(-${(targetFloor - 1) * 100}vh)`,
+            transitionProperty: "transform",
           }}
         >
           {/* Afficher ici le contenu spécifique à chaque étage */}
           <div
-            className={`${
-              targetFloor === 1 ? 'bg-green-300' : 'bg-blue-300'
-            } h-full flex items-center justify-center`}
+            className={`${targetFloor === 1 ? 'bg-green-300' : 'bg-blue-300'} h-screen flex items-center justify-center`}
           >
             <h1 className="text-white text-4xl">Étage {targetFloor}</h1>
           </div>
+          {/* Exemple d'étages supplémentaires */}
+          {Array.from({ length: 99 }, (_, index) => (
+            <div
+              key={index + 2}
+              className={`h-screen flex items-center justify-center ${index % 2 === 0 ? 'bg-blue-300' : 'bg-red-300'}`}
+            >
+              <h1 className="text-white text-4xl">Étage {index + 2}</h1>
+            </div>
+          ))}
         </div>
       </div>
 
