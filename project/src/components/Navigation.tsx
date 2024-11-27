@@ -49,7 +49,7 @@ export function Navigation() {
         onClick={handleScreenClick}
       />
       
-      <div className="fixed right-8 top-1/2 -translate-y-1/2 z-10">
+      <div className="fixed right-8 top-1/2 -translate-y-1/2 z-10 transform sm:scale-60 md:scale-100 lg:scale-100">
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6">
           <div className="flex flex-col items-center">
             <div className="relative w-10 h-80 bg-gray-200 rounded-full overflow-hidden">
