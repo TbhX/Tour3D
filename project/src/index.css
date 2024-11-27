@@ -4,7 +4,7 @@
 
 :root {
   background: rgb(96, 165, 250);
-  background: linear-gradient(180deg, rgba(96, 165, 250,1) 0%, rgba(30, 64, 175,1) 100%);
+  background: linear-gradient(180deg, rgba(96, 165, 250, 1) 0%, rgba(30, 64, 175, 1) 100%);
 }
 
 body {
@@ -42,4 +42,83 @@ canvas {
 
 .animate-fade-in {
   animation: fade-in 1s ease-out forwards;
+}
+
+/* Ajout de styles spécifiques pour les petits écrans (mobile-first) */
+@media (max-width: 640px) {
+  /* Ajustement de la position des éléments */
+  .relative {
+    position: relative;
+  }
+
+  /* Assurer que la vue ne dépasse pas l'écran */
+  .w-full {
+    width: 100%;
+  }
+  .h-screen {
+    height: 100vh; /* Utilisation de 100vh pour la hauteur de l'écran */
+  }
+  .overflow-hidden {
+    overflow: hidden;
+  }
+
+  /* Panneau d'ascenseur */
+  .fixed {
+    position: fixed;
+    top: 50%;
+    right: 2rem;
+    transform: translateY(-50%);
+  }
+
+  .bg-gradient-to-br {
+    background: linear-gradient(180deg, rgba(96, 165, 250, 1) 0%, rgba(30, 64, 175, 1) 100%);
+  }
+
+  /* Réduction de la taille des éléments pour mobile */
+  .text-4xl {
+    font-size: 2rem;
+  }
+
+  .text-lg {
+    font-size: 1.125rem;
+  }
+
+  .text-sm {
+    font-size: 0.875rem;
+  }
+
+  .w-10 {
+    width: 2.5rem;
+  }
+
+  .h-10 {
+    height: 2.5rem;
+  }
+
+  .bg-blue-500 {
+    background-color: #3b82f6;
+  }
+
+  /* Ajustement de l'animation */
+  .transition-all {
+    transition: all 0.3s ease-in-out;
+  }
+
+  .flex-col {
+    flex-direction: column;
+  }
+
+  /* Gestion de la barre d'ascenseur */
+  .w-full {
+    width: 100%;
+  }
+
+  /* Ajustement des marges et espacements */
+  .mt-4 {
+    margin-top: 1rem;
+  }
+
+  .space-y-2 {
+    gap: 0.5rem;
+  }
 }
