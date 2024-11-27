@@ -7,7 +7,6 @@ import { FloorIndicator } from './FloorIndicator';
 export function Navigation() {
   const { currentFloor, targetFloor, setTargetFloor, isTransitioning } = useStore();
   const elevatorRef = useRef<HTMLDivElement>(null);
-  const [scrollPosition, setScrollPosition] = useState(0);
 
   // Fonction pour changer d'étage
   const handleFloorChange = useCallback(
@@ -32,38 +31,16 @@ export function Navigation() {
     });
   }, [targetFloor, api]);
 
-  // Gestion des clics sur l'écran
-  const handleScreenClick = (e: React.MouseEvent) => {
+  // Gestion des clics sur les flèches haut et bas
+  const handleArrowClick = (direction: 'up' | 'down') => {
     if (!isTransitioning) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const clickY = e.clientY - rect.top;
-      const halfHeight = rect.height / 2;
-
-      // Cliquez sur la moitié supérieure ou inférieure de l'écran pour changer d'étage
-      if (clickY < halfHeight) {
-        handleFloorChange(targetFloor + 1); // Aller à l'étage supérieur
-      } else {
-        handleFloorChange(targetFloor - 1); // Aller à l'étage inférieur
-      }
+      const newFloor = direction === 'up' ? targetFloor + 1 : targetFloor - 1;
+      handleFloorChange(newFloor);
     }
-  };
-
-  // Fonction pour gérer le défilement
-  const handleScroll = (e: React.UIEvent) => {
-    const scrollY = e.currentTarget.scrollTop;
-    const newFloor = Math.round(((100 - scrollY) / e.currentTarget.scrollHeight) * 100);
-    handleFloorChange(Math.max(1, Math.min(100, newFloor)));
-    setScrollPosition(scrollY);
   };
 
   return (
     <>
-      {/* Zone cliquable de l'écran */}
-      <div 
-        className="fixed inset-0 z-0"
-        onClick={handleScreenClick}
-      />
-      
       {/* Panneau d'ascenseur à droite de l'écran */}
       <div className="fixed right-8 top-1/2 -translate-y-1/2 z-10">
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6">
@@ -86,15 +63,6 @@ export function Navigation() {
                 ref={elevatorRef}
                 className="absolute w-full cursor-pointer"
                 style={{ height: '100%' }}
-                onClick={(e) => {
-                  if (!isTransitioning) {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const y = e.clientY - rect.top;
-                    const percentage = 1 - y / rect.height;
-                    const floor = Math.round(percentage * 100);
-                    handleFloorChange(Math.max(1, Math.min(100, floor))); // Contrainte de l'étage entre 1 et 100
-                  }
-                }}
               >
                 {/* Indicateur d'ascenseur animé */}
                 <animated.div
@@ -118,16 +86,26 @@ export function Navigation() {
                 </div>
               )}
             </div>
+            
+            {/* Flèches de navigation */}
+            <div className="flex space-x-2 mt-4">
+              <button
+                onClick={() => handleArrowClick('up')}
+                disabled={isTransitioning || targetFloor >= 100}
+                className="w-10 h-10 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all"
+              >
+                ↑
+              </button>
+              <button
+                onClick={() => handleArrowClick('down')}
+                disabled={isTransitioning || targetFloor <= 1}
+                className="w-10 h-10 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all"
+              >
+                ↓
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Zone avec la possibilité de défiler pour changer d'étage */}
-      <div
-        className="overflow-y-scroll h-[90vh] sm:h-[80vh] md:h-[70vh] w-full absolute top-0 left-0 z-0"
-        onScroll={handleScroll}
-      >
-        {/* Cette zone est utilisée pour le défilement et l'interaction avec la scrollbar */}
       </div>
     </>
   );
