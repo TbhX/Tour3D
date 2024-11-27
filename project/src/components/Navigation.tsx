@@ -14,19 +14,23 @@ export function Navigation() {
     isTransitioning,
     setDirection 
   } = useStore();
-  
+
   const elevatorRef = useRef<HTMLDivElement>(null);
   const { camera } = useThree();
 
+  // Debugging: Logging currentFloor, targetFloor, and isTransitioning
+  console.log('currentFloor:', currentFloor, 'targetFloor:', targetFloor, 'isTransitioning:', isTransitioning);
+
   const handleFloorChange = (floor: number) => {
+    console.log("Attempting to change to floor:", floor);  // Debugging floor change
     if (floor >= 1 && floor <= 100 && !isTransitioning) {
-      // Déterminer la direction du mouvement
+      console.log("Changing floor direction:", floor > targetFloor ? 'up' : 'down');  // Debugging direction
       setDirection(floor > targetFloor ? 'up' : 'down');
-      
       setTargetFloor(floor);
-      
+
       // Logique de zoom caméra
-      const yOffset = (floor - 50) * 4; // Centre par rapport au milieu du building
+      const yOffset = (floor - 50) * 4;
+      console.log("Camera Y offset:", yOffset);  // Debugging yOffset
 
       // Animation de la caméra avec GSAP
       gsap.to(camera.position, {
@@ -34,7 +38,9 @@ export function Navigation() {
         z: 20,
         x: 20,
         duration: 1.5,
-        ease: "power2.inOut"
+        ease: "power2.inOut",
+        onStart: () => console.log('Animation started'),  // GSAP onStart
+        onComplete: () => console.log('Animation completed'),  // GSAP onComplete
       });
     }
   };
@@ -45,6 +51,7 @@ export function Navigation() {
   }));
 
   useEffect(() => {
+    console.log("targetFloor has changed to:", targetFloor);  // Debugging targetFloor change
     api.start({
       top: `${((100 - targetFloor) / 100) * 100}%`,
     });
@@ -55,6 +62,8 @@ export function Navigation() {
       const rect = e.currentTarget.getBoundingClientRect();
       const clickY = e.clientY - rect.top;
       const halfHeight = rect.height / 2;
+
+      console.log("Screen clicked. Y position:", clickY, "Half height:", halfHeight);  // Debugging click position
 
       if (clickY < halfHeight) {
         // Monter d'un étage
@@ -72,6 +81,8 @@ export function Navigation() {
       const y = e.clientY - rect.top;
       const percentage = 1 - y / rect.height;
       const floor = Math.round(percentage * 100);
+
+      console.log("Track clicked. Calculated floor:", floor);  // Debugging floor calculation
       handleFloorChange(Math.max(1, Math.min(100, floor)));
     }
   };
