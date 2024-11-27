@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "@react-three/drei": "^9.117.3",
     "@react-three/fiber": "^8.17.10",
-    "gsap": "^3.12.5"
+    "gsap": "^3.12.5",
+    "three": "^0.170.0"
   }
 }
