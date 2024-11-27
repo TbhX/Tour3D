@@ -41,13 +41,12 @@ export function Navigation() {
 
   return (
     <>
-      {/* Vue principale avec les étages */}
+      {/* Vue 3D principale */}
       <div className="relative w-full h-screen overflow-hidden bg-gray-200">
-        {/* Vue principale qui change en fonction de l'étage choisi */}
         <div
           className="absolute inset-0 transition-all duration-500"
           style={{
-            transform: `translateY(-${(targetFloor - 1) * 100}vh)`,
+            transform: `perspective(1000px) rotateX(${(targetFloor - 1) * 3}deg) translateY(-${(targetFloor - 1) * 100}vh)`,
             transitionProperty: "transform",
           }}
         >
